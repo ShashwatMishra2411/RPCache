@@ -9,3 +9,10 @@ export function createContext({req, res}:CreateExpressContextOptions) {
         code: "",
     }
 }
+
+export function wsContext(){
+    return {
+        isAdmin: true,
+        code: "",
+    }
+}
