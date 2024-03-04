@@ -3,20 +3,20 @@ import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import {applyWSSHandler} from "@trpc/server/adapters/ws";
 import {appRouter} from "./routes/index";
-import { createContext, wsContext } from "./context.ts";
+import { createContext, getContext } from "./context";
 import ws from "ws";
 
 const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use("/trpc", createExpressMiddleware({router: appRouter
-,createContext: createContext}));
+,createContext: getContext}));
 
 const server = app.listen(3000);
 
 applyWSSHandler({
     wss: new ws.Server({server}),
     router: appRouter,
-    createContext: wsContext,
+    createContext,
 });
 console.log("hi");
 

@@ -38,7 +38,7 @@ export default function App() {
     async function fetch() {
       var res = await client.logToServer.mutate("Hello World");
       var ures = await client.users.getUser.query({ userId: "123" });
-      var ares = await client.admin.query();
+      var ares = await client.admin.query("Hello There");
       setResult(await client.sayHi.query());
       console.log(res);
       console.log("res", ures);

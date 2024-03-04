@@ -1,18 +1,20 @@
-import {CreateExpressContextOptions} from "@trpc/server/adapters/express"
+import { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 
 
-export function createContext({req, res}:CreateExpressContextOptions) {
+export function createContext() {
+    return {
+        isAdmin: true,
+        code: "",
+    }
+}
+
+export function getContext({ req, res }: CreateExpressContextOptions) {
     return {
         req,
         res,
         isAdmin: true,
-        code: "",
+        code: ""
     }
 }
 
-export function wsContext(){
-    return {
-        isAdmin: true,
-        code: "",
-    }
-}
+// {req, res}:CreateExpressContextOptions
