@@ -1,10 +1,21 @@
 // import React from 'react'
-import { createTRPCProxyClient, httpBatchLink, loggerLink } from "@trpc/client";
+import {
+  createTRPCProxyClient,
+  createWSClient,
+  httpBatchLink,
+  loggerLink,
+  wsLink,
+} from "@trpc/client";
 import { Approuter } from "../../Server/app";
 import { useEffect, useState } from "react";
 
 const client = createTRPCProxyClient<Approuter>({
   links: [
+    wsLink({
+      client: createWSClient({
+        url: "ws://localhost:3000/trpc",
+      }),
+    }),
     loggerLink(),
     //     In tRPC, httpBatchLink is a terminating link used to optimize performance by combining multiple individual tRPC operations into a single HTTP request sent to the server. This reduces the number of round trips required between the client and server, leading to faster communication.
 
@@ -40,6 +51,13 @@ export default function App() {
       var ures = await client.users.getUser.query({ userId: "123" });
       var ares = await client.admin.query("Hello There");
       setResult(await client.sayHi.query());
+      console.log(
+        client.users.updateUser.subscribe(undefined, {
+          onData: (id) => {
+            console.log("Updated", id);
+          },
+        })
+      );
       console.log(res);
       console.log("res", ures);
       console.log(ares);

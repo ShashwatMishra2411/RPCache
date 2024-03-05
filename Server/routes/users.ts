@@ -1,7 +1,7 @@
 import {t} from "../trpc"
 import {z} from "zod";
 import {EventEmitter} from "events";
-import { observable } from "@trpc/server/dist/observable";
+import { observable } from "@trpc/server/observable";
 
 
 const ee = new EventEmitter();
