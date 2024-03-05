@@ -17,6 +17,7 @@ export const userRouter = t.router({
     updateUser: t.procedure.subscription(()=>{
         return observable<string>((emit)=>{
             const onGetUser = (userId:string)=>{
+                console.log("User updated", userId);
                 emit.next(userId);
             }
             ee.on("getUser", onGetUser);

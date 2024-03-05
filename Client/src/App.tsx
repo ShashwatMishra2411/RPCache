@@ -5,18 +5,32 @@ import {
   httpBatchLink,
   loggerLink,
   wsLink,
+  splitLink,
 } from "@trpc/client";
 import { Approuter } from "../../Server/app";
 import { useEffect, useState } from "react";
 
 const client = createTRPCProxyClient<Approuter>({
   links: [
-    wsLink({
-      client: createWSClient({
-        url: "ws://localhost:3000/trpc",
+    loggerLink(),
+    splitLink({
+      condition: (op) => {
+        return op.type === "subscription";
+      },
+      true: wsLink({
+        client: createWSClient({
+          url: "ws://localhost:3000/trpc",
+        }),
+      }),
+      false: httpBatchLink({
+        //this is the ending link and you cannot add any link after this, like if i want to use loggerlink after this, it will not work
+        url: "http://localhost:3000/trpc",
+        headers: {
+          Authorization: "TOKEN",
+        },
       }),
     }),
-    loggerLink(),
+
     //     In tRPC, httpBatchLink is a terminating link used to optimize performance by combining multiple individual tRPC operations into a single HTTP request sent to the server. This reduces the number of round trips required between the client and server, leading to faster communication.
 
     // Here's a breakdown of its functionality:
@@ -33,13 +47,6 @@ const client = createTRPCProxyClient<Approuter>({
     // Batch size and URL length: Ensure the combined batch size doesn't exceed the server's limitations and the URL length doesn't become too large, causing HTTP errors. You can adjust the maxURLLength option in httpBatchLink to control this.
     // Not suitable for all requests: It might not be ideal for large requests or those requiring immediate responses, as waiting for all responses within the batch can be slower.
     // Overall, httpBatchLink is a valuable tool in tRPC for optimizing performance when dealing with numerous small, independent tRPC operations.
-    httpBatchLink({
-      //this is the ending link and you cannot add any link after this, like if i want to use loggerlink after this, it will not work
-      url: "http://localhost:3000/trpc",
-      headers: {
-        Authorization: "TOKEN",
-      },
-    }),
   ],
 });
 
@@ -48,22 +55,24 @@ export default function App() {
   useEffect(() => {
     async function fetch() {
       var res = await client.logToServer.mutate("Hello World");
-      var ures = await client.users.getUser.query({ userId: "123" });
+      // var ures = await client.users.getUser.query({ userId: "123" });
       var ares = await client.admin.query("Hello There");
       setResult(await client.sayHi.query());
-      console.log(
-        client.users.updateUser.subscribe(undefined, {
-          onData: (id) => {
-            console.log("Updated", id);
-          },
-        })
-      );
+      client.users.updateUser.subscribe(undefined, {
+        onData: (id) => {
+          console.log("Updated", id);
+        },
+      });
       console.log(res);
-      console.log("res", ures);
+      // console.log("res", ures);
       console.log(ares);
     }
     fetch();
   }, []);
 
-  return <div>{result}</div>;
+  return <div>
+    {result}
+    <button onClick={async ()=>{
+      await client.users.getUser.query({ userId: "123" });
+    }}>Click</button></div>;
 }

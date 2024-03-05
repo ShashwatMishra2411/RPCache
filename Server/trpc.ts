@@ -6,8 +6,8 @@ export const t = initTRPC.context<inferAsyncReturnType<typeof createContext>>().
 export const t1 = initTRPC.context<inferAsyncReturnType<typeof getContext>>().create();
 
 const isAdminMiddleware = t1.middleware(({ ctx, next }) => {
-    const token = ctx.req.headers.authorization;
-    if (token === "TOKEN") return next({ ctx: { user: { id: 1 } } });
+    // const token = ctx.req.headers.authorization;
+    if (ctx.isAdmin) return next({ ctx: { user: { id: 1 } } });
     else return next({ ctx: { code: "UNAUTHORIZED" } });
 })
 
