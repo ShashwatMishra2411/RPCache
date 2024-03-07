@@ -63,9 +63,11 @@ export default function App() {
           console.log("Updated", id);
         },
       });
+      var pics = await client.getPics.query();
       console.log(res);
       // console.log("res", ures);
       console.log(ares);
+      console.log(pics)
     }
     fetch();
   }, []);
